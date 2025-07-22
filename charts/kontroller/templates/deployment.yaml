@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kontroller.fullname" . }}-kontroller
+  namespace: {{ .Release.namespace }}
+  labels:
+    {{- include "kontroller.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "kontroller.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "kontroller.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "kontroller.serviceAccountName" . }}
+      containers:
+      - name: manager
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command:
+        - /manager
+        args:
+        - --leader-elect={{ .Values.controller.enableLeaderElection }}
+        - --metrics-bind-address=:8080
+        - --health-probe-bind-address=:8081
+        env:
+        - name: LOG_LEVEL
+          value: {{ .Values.controller.logLevel }}
+        ports:
+        - containerPort: 8080
+          name: metrics
+        - containerPort: 8081
+          name: health
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: health
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: health
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        nodeSelector: {{ toYaml .Values.nodeSelector | nindent 8 }}
+        tolerations: {{ toYaml .Values.tolerations | nindent 8 }}
+        affinity: {{ toYaml .Values.affinity | nindent 8 }}

@@ -1,0 +1,9 @@
+{{- if .Values.rbac.create }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.rbac.serviceAccountName }}
+  labels:
+    app: kontroller
+    release: {{ .Release.Name }}
+{{- end }}

@@ -1,0 +1,40 @@
+replicaCount: 2
+
+image:
+  repository: your-registry/myapp-controller
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  name: ""
+
+rbac:
+  create: true
+  serviceAccountName: kontroller-sa
+
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 64Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# Controller configuration
+controller:
+  namespace: myapp-system
+  logLevel: info
+  enableLeaderElection: false
+
+# Gateway API support
+gatewayAPI:
+  enabled: true
