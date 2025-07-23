@@ -6,15 +6,19 @@ uses config files from <https://github.com/tataruty/ngf_test_app/tree/main> repo
 
 build image:
 
-`docker build . -t kontroller:latest --platform linux/amd64,linux/arm64`
+`docker build . -t kontroller:latestv2.1.0 --platform linux/amd64,linux/arm64`
 
 add tag:
 
-`docker tag kontroller:latest tusova194/kontroller`
+`docker tag kontroller:v2.1.0 tusova194/kontroller`
 
-push:
+and:
 
-`docker push tusova194/kontroller`
+`docker push tusova194/kontroller:v2.1.0`
+
+OR:
+
+`docker build -t tusova194/kontroller:v2.1.0 . --platform linux/amd64,linux/arm64`
 
 ## To run
 
@@ -24,7 +28,7 @@ push:
 
 2. Run helm installation:
 
-`helm install kontroller-release ./charts/kontroller --set fullnameOverride=full-overrrmi`
+`helm install kontroller-release ./charts/kontroller --set fullnameOverride=full-overrrmi --set image.tag=v2.1.0`
 
 ## To uninstall
 
@@ -40,12 +44,12 @@ conntect to logs:
 
 create namespace:
 
-`kubectl create namespace TNS`
+`kubectl create namespace tns`
 
 deploy some service:
 
 ```yaml
-kubectl apply -f - -n TNS <<EOF
+kubectl apply -f - -n tns <<EOF
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -84,18 +88,18 @@ EOF
 
 check:
 
-`kubectl get all -o wide -n TNS`
+`kubectl get all -o wide -n tns`
 
 delete:
 
-`deployment.apps/my-app -n TNS`
+`deployment.apps/my-app -n tns`
 
 ### HTTPRoute
 
 create httpRoute:
 
 ```yaml
-kubectl apply -f - -n TNS <<EOF
+kubectl apply -f - -n tns <<EOF
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -119,8 +123,8 @@ EOF
 
 check:
 
-`kubectl get httproutes -n TNS`
+`kubectl get httproutes -n tns`
 
 delete:
 
-`kubectl delete httproute my-app-route -n TNS`
+`kubectl delete httproute my-app-route -n tns`

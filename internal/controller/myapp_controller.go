@@ -64,7 +64,7 @@ func (r *MyappReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		var httpRoutes gatewayv1.HTTPRouteList
 		if err := r.List(ctx, &httpRoutes, client.InNamespace(req.Namespace)); err != nil {
 			logger.Info("Failed to list HTTPRoutes (Gateway API may not be available)", "error", err)
-		} else if len(httpRoutes.Items) > 0 { // ← This condition should prevent logging when count=0
+		} else if len(httpRoutes.Items) > 0 {
 			logger.Info("Found HTTPRoutes in namespace\n", "count", len(httpRoutes.Items), "namespace", req.Namespace)
 			// Log each HTTPRoute for debugging
 			for _, route := range httpRoutes.Items {
@@ -96,17 +96,17 @@ func (r *MyappReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 	}
 
 	// Try to fetch as Myapp instance
-	var myapp webappv1.Myapp
-	if err := r.Get(ctx, req.NamespacedName, &myapp); err != nil {
-		if client.IgnoreNotFound(err) == nil {
-			logger.Info("Resource not found. Ignoring since object must be deleted", "namespacedName", req.NamespacedName)
-			return ctrl.Result{}, nil
-		}
-		logger.Error(err, "Failed to get resource")
-		return ctrl.Result{}, err
-	}
+	// var myapp webappv1.Myapp
+	// if err := r.Get(ctx, req.NamespacedName, &myapp); err != nil {
+	// 	if client.IgnoreNotFound(err) == nil {
+	// 		logger.Info("Resource MyApp is not found. Ignoring since object must be deleted", "namespacedName", req.NamespacedName)
+	// 		return ctrl.Result{}, nil
+	// 	}
+	// 	logger.Error(err, "Failed to get resource")
+	// 	return ctrl.Result{}, err
+	// }
 
-	logger.Info("Myapp event detected", "name", myapp.Name, "namespace", myapp.Namespace)
+	// logger.Info("Myapp event detected", "name", myapp.Name, "namespace", myapp.Namespace)
 
 	return ctrl.Result{}, nil
 }
