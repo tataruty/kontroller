@@ -58,22 +58,36 @@ func (r *MyappReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 	// Check if this is an HTTPRoute event
 	var httpRoute gatewayv1.HTTPRoute
 	if err := r.Get(ctx, req.NamespacedName, &httpRoute); err == nil {
-		logger.Info("HTTPRoute event detected\n")
+		logger.Info("HTTPRoute event detected\n",
+			"name", httpRoute.Name,
+			"namespace", httpRoute.Namespace,
+			"generation", httpRoute.Generation,
+			"resourceVersion", httpRoute.ResourceVersion)
 
 		// List all HTTPRoutes in the same namespace
 		var httpRoutes gatewayv1.HTTPRouteList
 		if err := r.List(ctx, &httpRoutes, client.InNamespace(req.Namespace)); err != nil {
 			logger.Info("Failed to list HTTPRoutes (Gateway API may not be available)", "error", err)
 		} else if len(httpRoutes.Items) > 0 {
-			logger.Info("Found HTTPRoutes in namespace\n", "count", len(httpRoutes.Items), "namespace", req.Namespace)
-			// Log each HTTPRoute for debugging
-			for _, route := range httpRoutes.Items {
-				logger.Info("HTTPRoute in namespace",
-					"namespace", route.Namespace,
-					"\nname", route.Name,
-					"generation", route.Generation,
-					"resourceVersion", route.ResourceVersion)
-			}
+			logger.Info("<======== All HTTPRoutes in namespace =======>\n", "count", len(httpRoutes.Items), "namespace", req.Namespace)
+		}
+		return ctrl.Result{}, nil
+	}
+
+	// List all HTTPRoutes in the same namespace to detect changes
+	var httpRoutes gatewayv1.HTTPRouteList
+	if err := r.List(ctx, &httpRoutes, client.InNamespace(req.Namespace)); err != nil {
+		logger.Info("Failed to list HTTPRoutes (Gateway API may not be available)", "error", err)
+		// Continue with Myapp processing even if HTTPRoute listing fails
+	} else if len(httpRoutes.Items) > 0 {
+		logger.Info("Found HTTPRoutes in namespace\n", "count", len(httpRoutes.Items), "namespace", req.Namespace)
+		// Log each HTTPRoute for debugging
+		for _, route := range httpRoutes.Items {
+			logger.Info("HTTPRoute in namespace",
+				"namespace", route.Namespace,
+				"\nname", route.Name,
+				"generation", route.Generation,
+				"resourceVersion", route.ResourceVersion)
 		}
 	}
 
@@ -93,20 +107,39 @@ func (r *MyappReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		} else if len(services.Items) > 0 {
 			logger.Info("<======== All Services in namespace =======>\n", "count", len(services.Items), "namespace", req.Namespace)
 		}
+		return ctrl.Result{}, nil
+	}
+
+	// List all Services in the same namespace to detect changes
+	var services corev1.ServiceList
+	if err := r.List(ctx, &services, client.InNamespace(req.Namespace)); err != nil {
+		logger.Info("Failed to list Services", "error", err)
+		// Continue with Myapp processing even if Services listing fails
+	} else if len(services.Items) > 0 {
+		logger.Info("Found Services in namespace\n", "count", len(services.Items), "namespace", req.Namespace)
+
+		// Log each Service for debugging
+		for _, service := range services.Items {
+			logger.Info("Service in namespace",
+				"namespace", service.Namespace,
+				"\nname", service.Name,
+				"generation", service.Generation,
+				"resourceVersion", service.ResourceVersion)
+		}
 	}
 
 	// Try to fetch as Myapp instance
-	// var myapp webappv1.Myapp
-	// if err := r.Get(ctx, req.NamespacedName, &myapp); err != nil {
-	// 	if client.IgnoreNotFound(err) == nil {
-	// 		logger.Info("Resource MyApp is not found. Ignoring since object must be deleted", "namespacedName", req.NamespacedName)
-	// 		return ctrl.Result{}, nil
-	// 	}
-	// 	logger.Error(err, "Failed to get resource")
-	// 	return ctrl.Result{}, err
-	// }
+	var myapp webappv1.Myapp
+	if err := r.Get(ctx, req.NamespacedName, &myapp); err != nil {
+		if client.IgnoreNotFound(err) == nil {
+			logger.Info("Resource MyApp not found in RequestNamespace. Ignoring since object must be deleted", "namespacedName", req.NamespacedName)
+			return ctrl.Result{}, nil
+		}
+		logger.Error(err, "Failed to get resource")
+		return ctrl.Result{}, err
+	}
 
-	// logger.Info("Myapp event detected", "name", myapp.Name, "namespace", myapp.Namespace)
+	logger.Info("Myapp event detected", "name", myapp.Name, "namespace", myapp.Namespace)
 
 	return ctrl.Result{}, nil
 }
