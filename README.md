@@ -18,10 +18,11 @@ push:
 
 ## To run
 
-1. add gateway CRDs:
+1. Add gateway CRDs:
 
 `kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml`
-2. run helm installation:
+
+2. Run helm installation:
 
 `helm install kontroller-release ./charts/kontroller --set fullnameOverride=full-overrrmi`
 
