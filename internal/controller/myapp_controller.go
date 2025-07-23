@@ -53,7 +53,7 @@ type MyappReconciler struct {
 func (r *MyappReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger := logf.FromContext(ctx)
 
-	logger.Info("------------------------- Reconciling the resource -------------------------\n")
+	logger.Info("\n\n------------------------- Reconciling the resource -------------------------\n")
 
 	// Check if this is an HTTPRoute event
 	var httpRoute gatewayv1.HTTPRoute
@@ -85,7 +85,7 @@ func (r *MyappReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		for _, route := range httpRoutes.Items {
 			logger.Info("HTTPRoute in namespace",
 				"namespace", route.Namespace,
-				"\nname", route.Name,
+				"name", route.Name,
 				"generation", route.Generation,
 				"resourceVersion", route.ResourceVersion)
 		}
@@ -122,7 +122,7 @@ func (r *MyappReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		for _, service := range services.Items {
 			logger.Info("Service in namespace",
 				"namespace", service.Namespace,
-				"\nname", service.Name,
+				"name", service.Name,
 				"generation", service.Generation,
 				"resourceVersion", service.ResourceVersion)
 		}
