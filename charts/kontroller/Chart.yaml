@@ -1,7 +1,8 @@
 apiVersion: v2
-name: kontroller
+name: kontroller-chart
 description: Helm chart for Kontroller - a Kubernetes controller watching HTTPRoutes and Services
 type: application
 version: 0.1.0
 appVersion: "1.0.0"
-icon: ./kontroller.png
+icon: https://raw.githubusercontent.com/tataruty/kontroller/main/charts/kontroller/kontroller.png
+home: https://github.com/tataruty/kontroller

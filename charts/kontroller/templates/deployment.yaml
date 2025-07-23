@@ -20,15 +20,6 @@ spec:
       - name: manager
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        command:
-        - /manager
-        args:
-        - --leader-elect={{ .Values.controller.enableLeaderElection }}
-        - --metrics-bind-address=:8080
-        - --health-probe-bind-address=:8081
-        env:
-        - name: LOG_LEVEL
-          value: {{ .Values.controller.logLevel }}
         ports:
         - containerPort: 8080
           name: metrics
@@ -44,6 +35,15 @@ spec:
             port: health
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
-        nodeSelector: {{ toYaml .Values.nodeSelector | nindent 8 }}
-        tolerations: {{ toYaml .Values.tolerations | nindent 8 }}
-        affinity: {{ toYaml .Values.affinity | nindent 8 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

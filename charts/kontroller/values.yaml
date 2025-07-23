@@ -1,7 +1,7 @@
 replicaCount: 2
 
 image:
-  repository: your-registry/myapp-controller
+  repository: tusova194/kontroller
   pullPolicy: IfNotPresent
   tag: "latest"
 
@@ -29,12 +29,11 @@ nodeSelector: {}
 tolerations: []
 affinity: {}
 
-# Controller configuration
-controller:
-  namespace: myapp-system
-  logLevel: info
-  enableLeaderElection: false
-
 # Gateway API support
 gatewayAPI:
   enabled: true
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 8080

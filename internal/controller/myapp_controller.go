@@ -58,7 +58,7 @@ func (r *MyappReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 	// Check if this is an HTTPRoute event
 	var httpRoute gatewayv1.HTTPRoute
 	if err := r.Get(ctx, req.NamespacedName, &httpRoute); err == nil {
-		logger.Info("HTTPRoute event detected",
+		logger.Info("HTTPRoute event detected\n",
 			"name", httpRoute.Name,
 			"namespace", httpRoute.Namespace,
 			"generation", httpRoute.Generation,
@@ -68,7 +68,7 @@ func (r *MyappReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		var httpRoutes gatewayv1.HTTPRouteList
 		if err := r.List(ctx, &httpRoutes, client.InNamespace(req.Namespace)); err != nil {
 			logger.Info("Failed to list HTTPRoutes (Gateway API may not be available)", "error", err)
-		} else {
+		} else if len(httpRoutes.Items) > 0 {
 			logger.Info("<======== All HTTPRoutes in namespace =======>\n", "count", len(httpRoutes.Items), "namespace", req.Namespace)
 		}
 		return ctrl.Result{}, nil
@@ -79,14 +79,13 @@ func (r *MyappReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 	if err := r.List(ctx, &httpRoutes, client.InNamespace(req.Namespace)); err != nil {
 		logger.Info("Failed to list HTTPRoutes (Gateway API may not be available)", "error", err)
 		// Continue with Myapp processing even if HTTPRoute listing fails
-	} else {
-		logger.Info("Found HTTPRoutes in namespace", "count", len(httpRoutes.Items), "namespace", req.Namespace)
-
+	} else if len(httpRoutes.Items) > 0 {
+		logger.Info("Found HTTPRoutes in namespace\n", "count", len(httpRoutes.Items), "namespace", req.Namespace)
 		// Log each HTTPRoute for debugging
 		for _, route := range httpRoutes.Items {
 			logger.Info("HTTPRoute in namespace",
-				"name", route.Name,
 				"namespace", route.Namespace,
+				"\nname", route.Name,
 				"generation", route.Generation,
 				"resourceVersion", route.ResourceVersion)
 		}
@@ -95,7 +94,7 @@ func (r *MyappReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 	// Check if this is an Service event
 	var service corev1.Service
 	if err := r.Get(ctx, req.NamespacedName, &service); err == nil {
-		logger.Info("Service event detected",
+		logger.Info("Service event detected\n",
 			"name", service.Name,
 			"namespace", service.Namespace,
 			"generation", service.Generation,
@@ -105,7 +104,7 @@ func (r *MyappReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		var services corev1.ServiceList
 		if err := r.List(ctx, &services, client.InNamespace(req.Namespace)); err != nil {
 			logger.Info("Failed to list Services", "error", err)
-		} else {
+		} else if len(services.Items) > 0 {
 			logger.Info("<======== All Services in namespace =======>\n", "count", len(services.Items), "namespace", req.Namespace)
 		}
 		return ctrl.Result{}, nil
@@ -116,14 +115,14 @@ func (r *MyappReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 	if err := r.List(ctx, &services, client.InNamespace(req.Namespace)); err != nil {
 		logger.Info("Failed to list Services", "error", err)
 		// Continue with Myapp processing even if Services listing fails
-	} else {
-		logger.Info("Found Services in namespace", "count", len(services.Items), "namespace", req.Namespace)
+	} else if len(services.Items) > 0 {
+		logger.Info("Found Services in namespace\n", "count", len(services.Items), "namespace", req.Namespace)
 
 		// Log each Service for debugging
 		for _, service := range services.Items {
 			logger.Info("Service in namespace",
-				"name", service.Name,
 				"namespace", service.Namespace,
+				"\nname", service.Name,
 				"generation", service.Generation,
 				"resourceVersion", service.ResourceVersion)
 		}

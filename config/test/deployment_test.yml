@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kontroller-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-kontroller-test
+  template:
+    metadata:
+      labels:
+        app: my-kontroller-test
+    spec:
+      containers:
+      - name: my-kontroller-test
+        image: tusova194/kontroller:latest
+        ports:
+        - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-kontroller-service
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+    name: http
+  selector:
+    app: my-kontroller-test
